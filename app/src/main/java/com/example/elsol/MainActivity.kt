@@ -1,16 +1,36 @@
 package com.example.elsol
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.Toast
+import android.widget.AutoCompleteTextView
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import android.view.Menu
+import android.view.MenuItem
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var solarItems: MutableList<SolarAdapter.SolarItem>
     private lateinit var adapter: SolarAdapter
+
+    // Mapa con datos de los planetas (Diámetro, Distancia al sol, Densidad)
+    private val planetData = mapOf(
+        "Mercurio" to Triple(0.382, 0.387, 5400),
+        "Venus" to Triple(0.949, 0.723, 5250),
+        "Tierra" to Triple(1.0, 1.0, 5520),
+        "Marte" to Triple(0.53, 1.542, 3960),
+        "Júpiter" to Triple(11.2, 5.203, 1350),
+        "Saturno" to Triple(9.41, 9.539, 700),
+        "Urano" to Triple(3.38, 19.81, 1200),
+        "Neptuno" to Triple(3.81, 30.07, 1500),
+        "Plutón" to Triple(0.18, 39.44, 1700) // Datos aproximados para Plutón
+    )
+
+    private var cutItemGlobal: SolarAdapter.SolarItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,7 +110,57 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
     }
 
-    // Variable global para guardar el ítem cortado
-    private var cutItemGlobal: SolarAdapter.SolarItem? = null
-}
+    // Inflar el menú con la opción de comparar planetas
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_compare, menu)
+        return true
+    }
 
+    // Manejar la selección de la opción "Comparar Planetas"
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_compare -> {
+                // Iniciar la nueva actividad para la comparación de planetas
+                val intent = Intent(this, ComparePlanetsActivity::class.java)
+                startActivity(intent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+
+    private fun showPlanetComparisonDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.activity_compare_planets, null)
+
+        val planetNames = planetData.keys.toList()
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, planetNames)
+
+        val planet1 = dialogView.findViewById<AutoCompleteTextView>(R.id.planet1)
+        val planet2 = dialogView.findViewById<AutoCompleteTextView>(R.id.planet2)
+
+        planet1.setAdapter(adapter)
+        planet2.setAdapter(adapter)
+
+        AlertDialog.Builder(this)
+            .setTitle("Comparar Planetas")
+            .setView(dialogView)
+            .setPositiveButton("Comparar") { _, _ ->
+                val planet1Name = planet1.text.toString()
+                val planet2Name = planet2.text.toString()
+
+                if (planetData.containsKey(planet1Name) && planetData.containsKey(planet2Name)) {
+                    // Abrir la nueva actividad con los planetas seleccionados
+                    val intent = Intent(this, ComparePlanetsDetailActivity::class.java)
+                    intent.putExtra("planet1", planet1Name)
+                    intent.putExtra("planet2", planet2Name)
+                    startActivity(intent)
+                } else {
+                    Toast.makeText(this, "Planeta no encontrado", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+}
