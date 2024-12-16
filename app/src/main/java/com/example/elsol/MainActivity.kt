@@ -12,12 +12,21 @@ import androidx.recyclerview.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuItem
 
+/**
+ * La clase MainActivity representa la pantalla principal de la aplicación.
+ * Permite gestionar ítems relacionados con el sistema solar y proporciona una opción
+ * para comparar planetas a través de un menú.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var solarItems: MutableList<SolarAdapter.SolarItem>
     private lateinit var adapter: SolarAdapter
 
-    // Mapa con datos de los planetas (Diámetro, Distancia al sol, Densidad)
+    /**
+     * Mapa con datos de los planetas.
+     * Contiene el nombre del planeta como clave y un Triple con los datos:
+     * diámetro relativo a la Tierra, distancia al Sol en unidades astronómicas (UA), y densidad en kg/m³.
+     */
     private val planetData = mapOf(
         "Mercurio" to Triple(0.382, 0.387, 5400),
         "Venus" to Triple(0.949, 0.723, 5250),
@@ -27,18 +36,22 @@ class MainActivity : AppCompatActivity() {
         "Saturno" to Triple(9.41, 9.539, 700),
         "Urano" to Triple(3.38, 19.81, 1200),
         "Neptuno" to Triple(3.81, 30.07, 1500),
-        "Plutón" to Triple(0.18, 39.44, 1700) // Datos aproximados para Plutón
+        "Plutón" to Triple(0.18, 39.44, 1700) //datos aproximados para Plutón
     )
 
     private var cutItemGlobal: SolarAdapter.SolarItem? = null
 
+    /**
+     * Método de inicialización de la actividad.
+     * Se configura el RecyclerView para mostrar ítems del sistema solar y se inicializa el adaptador.
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
 
-        // Lista mutable para permitir cambios dinámicos
+        //lista mutable para permitir cambios dinámicos
         solarItems = mutableListOf(
             SolarAdapter.SolarItem(R.drawable.corona_solar, "Corona Solar"),
             SolarAdapter.SolarItem(R.drawable.erupcionsolar, "Erupción Solar"),
@@ -48,7 +61,7 @@ class MainActivity : AppCompatActivity() {
             SolarAdapter.SolarItem(R.drawable.manchasolar, "Mancha Solar")
         )
 
-        // Crear adaptador y pasar la lista mutable
+        //crear adaptador y pasar la lista mutable
         adapter = SolarAdapter(solarItems) { option, position ->
             when (option) {
                 "Eliminar" -> {
@@ -63,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Ítem copiado", Toast.LENGTH_SHORT).show()
                 }
                 "Renombrar" -> {
-                    // Mostrar un dialogo para renombrar
+                    //mostrar un dialogo para renombrar
                     val dialogView = layoutInflater.inflate(R.layout.dialog_rename, null)
                     val editText = dialogView.findViewById<EditText>(R.id.editText)
 
@@ -82,16 +95,16 @@ class MainActivity : AppCompatActivity() {
                         .show()
                 }
                 "Cortar" -> {
-                    // Cortar el ítem y guardarlo para pegar en otro lugar
+                    //cortar el ítem y guardarlo para pegar en otro lugar
                     val cutItem = solarItems[position]
                     solarItems.removeAt(position)
                     adapter.notifyItemRemoved(position)
-                    // Guardamos el ítem cortado en una variable global para pegarlo
+                    //guardamos el ítem cortado en una variable global para pegarlo
                     cutItemGlobal = cutItem
                     Toast.makeText(this, "Ítem cortado", Toast.LENGTH_SHORT).show()
                 }
                 "Mover" -> {
-                    // Mover el ítem a una nueva posición
+                    //mover el ítem a una nueva posición
                     cutItemGlobal?.let { itemToMove ->
                         solarItems.add(position, itemToMove)
                         adapter.notifyItemInserted(position)
@@ -110,13 +123,20 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
     }
 
-    // Inflar el menú con la opción de comparar planetas
+    /**
+     * Método para inflar el menú de opciones.
+     * @return true si el menú se ha inflado correctamente.
+     */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_compare, menu)
         return true
     }
 
-    // Manejar la selección de la opción "Comparar Planetas"
+    /**
+     * Maneja la selección de opciones del menú.
+     * @param item Elemento del menú seleccionado.
+     * @return true si la acción se maneja correctamente, false en caso contrario.
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_compare -> {
@@ -129,7 +149,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
+    /**
+     * Muestra un cuadro de diálogo para seleccionar y comparar dos planetas.
+     * Se utiliza AutoCompleteTextView para facilitar la selección de nombres de planetas.
+     */
     private fun showPlanetComparisonDialog() {
         val dialogView = layoutInflater.inflate(R.layout.activity_compare_planets, null)
 
@@ -150,7 +173,7 @@ class MainActivity : AppCompatActivity() {
                 val planet2Name = planet2.text.toString()
 
                 if (planetData.containsKey(planet1Name) && planetData.containsKey(planet2Name)) {
-                    // Abrir la nueva actividad con los planetas seleccionados
+                    //abrir la nueva actividad con los planetas seleccionados
                     val intent = Intent(this, ComparePlanetsDetailActivity::class.java)
                     intent.putExtra("planet1", planet1Name)
                     intent.putExtra("planet2", planet2Name)

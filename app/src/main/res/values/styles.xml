@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.ElSol" parent="Theme.AppCompat.Light"/>
+    <style name="Theme.ElSol" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">#88E269</item>
+        <item name="colorPrimaryDark">#2B870C</item>
+        <item name="colorAccent">#88E269</item> <!-- Color de acento -->
+        <item name="android:statusBarColor">#2B870C</item> <!-- Color para la StatusBar -->
+    </style>
 </resources>

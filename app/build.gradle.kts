@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("org.jetbrains.dokka") version "1.9.20"
 }
 
 android {
@@ -71,3 +72,19 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.android.material:material:1.10.0")
 }
+
+//configuración para la tarea dokkaHtml existente
+tasks.named<org.jetbrains.dokka.gradle.DokkaTask>("dokkaHtml") {
+    outputDirectory.set(layout.buildDirectory.dir("documentation/html"))
+}
+
+//en el terminal del Android Studio: ./gradlew dokkaHtml
+
+
+
+/*
+//configuración para generar documentación con Dokka SIN QUE EXISTA ANTES
+tasks.register("dokkaHtml", org.jetbrains.dokka.gradle.DokkaTask::class) {
+    outputDirectory.set(layout.buildDirectory.dir("documentation/html"))
+}
+ */
